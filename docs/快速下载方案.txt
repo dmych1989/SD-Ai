@@ -1,0 +1,108 @@
+# 🚀 快速下载方案 - Local AI Image Generator 后端
+
+## 问题：GitHub 下载速度极慢（5-10 KB/s）
+
+## ✅ 解决方案：使用多线程下载工具
+
+### 方法 1：Internet Download Manager (IDM) - 推荐
+1. 下载并安装 IDM：https://www.internetdownloadmanager.com/
+2. 复制下面的链接，IDM 会自动捕获下载
+3. IDM 会自动开启多线程（通常 8-16 线程），速度提升 10-50 倍
+
+### 方法 2：Motrix（免费开源）
+1. 下载 Motrix：https://motrix.app/
+2. 支持 HTTP/FTP/BT，界面友好
+3. 同样支持多线程加速
+
+### 方法 3：浏览器插件（可配合 IDM）
+- Chrome/Edge: 安装 "Chrono Download Manager" 或 "Download Them All"
+- 可以手动选择多线程下载
+
+---
+
+## 📥 下载链接（使用 ghproxy.net 镜像）
+
+### CUDA 后端（NVIDIA GPU）~335 MB
+**镜像地址**（复制到下载工具）：
+``
+https://ghproxy.net/https://github.com/leejet/stable-diffusion.cpp/releases/download/master-669-2d40a8b/sd-master-2d40a8b-bin-win-cuda12-x64.zip
+``
+**原始地址**（备用）：
+``
+https://github.com/leejet/stable-diffusion.cpp/releases/download/master-669-2d40a8b/sd-master-2d40a8b-bin-win-cuda12-x64.zip
+``
+
+### Vulkan 后端（AMD/Intel GPU 或 CPU）~35 MB
+**镜像地址**：
+``
+https://ghproxy.net/https://github.com/leejet/stable-diffusion.cpp/releases/download/master-669-2d40a8b/sd-master-2d40a8b-bin-win-vulkan-x64.zip
+``
+**原始地址**（备用）：
+``
+https://github.com/leejet/stable-diffusion.cpp/releases/download/master-669-2d40a8b/sd-master-2d40a8b-bin-win-vulkan-x64.zip
+``
+
+---
+
+## 📦 下载后安装步骤
+
+### 1. CUDA 后端安装
+下载完成后，将文件放到：
+``
+D:\GitHub\Local-AI-Image-Generator\app\tools\sd-cuda.zip
+``
+然后以管理员身份运行 PowerShell，执行：
+``powershell
+cd D:\GitHub\Local-AI-Image-Generator\app\tools
+Expand-Archive -Path sd-cuda.zip -DestinationPath sd-cuda-temp -Force
+ = "D:\GitHub\Local-AI-Image-Generator\app\backend\win\cuda"
+Copy-Item "sd-cuda-temp\bin\sd-server.exe" "\sd-cuda.exe" -Force
+Copy-Item "sd-cuda-temp\bin\stable-diffusion.dll"  -Force
+Get-ChildItem "sd-cuda-temp" -Filter "*.dll" -Recurse | Copy-Item -Destination  -Force
+Remove-Item "sd-cuda.zip" -Force
+Remove-Item "sd-cuda-temp" -Recurse -Force
+``
+
+### 2. Vulkan 后端安装
+下载完成后，将文件放到：
+``
+D:\GitHub\Local-AI-Image-Generator\app\tools\sd-vulkan.zip
+``
+执行：
+``powershell
+cd D:\GitHub\Local-AI-Image-Generator\app\tools
+Expand-Archive -Path sd-vulkan.zip -DestinationPath sd-vulkan-temp -Force
+ = "D:\GitHub\Local-AI-Image-Generator\app\backend\win\vulkan"
+Copy-Item "sd-vulkan-temp\bin\sd-server.exe" "\sd-vulkan.exe" -Force
+Copy-Item "sd-vulkan-temp\bin\stable-diffusion.dll"  -Force
+Get-ChildItem "sd-vulkan-temp" -Filter "*.dll" -Recurse | Copy-Item -Destination  -Force
+Remove-Item "sd-vulkan.zip" -Force
+Remove-Item "sd-vulkan-temp" -Recurse -Force
+``
+
+---
+
+## ✅ 验证安装
+
+安装完成后，检查以下目录应该有文件：
+- pp\backend\win\cuda\ - 应该看到 sd-cuda.exe, stable-diffusion.dll 等
+- pp\backend\win\vulkan\ - 应该看到 sd-vulkan.exe, stable-diffusion.dll 等
+
+然后启动项目：
+- 双击 start.bat
+- 或访问 http://localhost:1420
+
+---
+
+## 💡 提示
+
+1. **使用下载工具** - 浏览器直接下载速度很慢，一定要用 IDM 或 Motrix
+2. **镜像加速** - ghproxy.net 镜像通常比直接连 GitHub 快
+3. **断点续传** - 如果下载中断，下载工具会自动断点续传
+4. **网络时段** - 如果下载工具也不快，可以尝试在网络空闲时（如凌晨）下载
+
+---
+
+## 📞 需要帮助？
+
+如果下载或安装遇到问题，随时告诉我！

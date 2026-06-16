@@ -1,0 +1,19 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        // MNN 官方 Maven（如有）；否则用 JitPack 或本地 aar
+        maven { url 'https://www.jitpack.io' }
+    }
+}
+
+rootProject.name = "SD-AI-Android"
+include ':app'

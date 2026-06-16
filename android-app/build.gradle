@@ -1,0 +1,19 @@
+// 项目级 build.gradle
+buildscript {
+    ext {
+        kotlin_version = '1.9.22'
+        compose_version = '1.7.0'
+        agp_version = '8.3.0'
+    }
+}
+
+plugins {
+    id 'com.android.application' version "${agp_version}" apply false
+    id 'com.android.library' version "${agp_version}" apply false
+    id 'org.jetbrains.kotlin.android' version "${kotlin_version}" apply false
+    id 'org.jetbrains.kotlin.plugin.serialization' version "${kotlin_version}" apply false
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

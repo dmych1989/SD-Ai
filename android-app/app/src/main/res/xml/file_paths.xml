@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FileProvider 路径配置：用于分享生成的图片 -->
+<paths>
+    <!-- cache-path 对应 getCacheDir() -->
+    <cache-path
+        name="shared_images"
+        path="." />
+    <!-- files-path 对应 getFilesDir() -->
+    <files-path
+        name="internal_images"
+        path="." />
+    <!-- external-files-path 对应 getExternalFilesDir() -->
+    <external-files-path
+        name="external_images"
+        path="." />
+</paths>

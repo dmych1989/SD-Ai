@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SD-AI 本地生图</string>
+    <string name="generate">生成</string>
+    <string name="gallery">画廊</string>
+    <string name="models">模型</string>
+    <string name="settings">设置</string>
+    <string name="prompt_hint">输入提示词…</string>
+    <string name="negative_prompt_hint">负向提示词…</string>
+    <string name="seed">种子（-1 为随机）</string>
+    <string name="steps">步数</string>
+    <string name="cfg_scale">CFG 强度</string>
+    <string name="width">宽度</string>
+    <string name="height">高度</string>
+    <string name="sampler">采样器</string>
+    <string name="mode_local">本地离线</string>
+    <string name="mode_remote">远程 PC</string>
+    <string name="remote_host">PC 地址</string>
+    <string name="remote_port">端口</string>
+    <string name="test_connection">测试连接</string>
+    <string name="connecting">连接中…</string>
+    <string name="connected">已连接</string>
+    <string name="connection_failed">连接失败</string>
+    <string name="start_generate">开始生成</string>
+    <string name="generating">生成中…</string>
+    <string name="save_image">保存到相册</string>
+    <string name="share_image">分享</string>
+    <string name="export_logs">导出日志</string>
+    <string name="capture_logcat">抓取 Logcat</string>
+    <string name="no_model_loaded">未加载模型</string>
+    <string name="model_loaded">模型已加载</string>
+    <string name="import_model">导入模型</string>
+    <string name="delete_model">删除模型</string>
+    <string name="download_model">下载模型</string>
+    <string name="log_saved">日志已保存</string>
+    <string name="log_save_failed">日志保存失败</string>
+    <string name="permission_required">需要权限</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="version">版本</string>
+    <string name="build_time">构建时间</string>
+    <string name="device_info">设备信息</string>
+    <string name="view_logs">查看日志</string>
+    <string name="clear_logs">清除日志</string>
+    <string name="send_logs">发送日志</string>
+</resources>

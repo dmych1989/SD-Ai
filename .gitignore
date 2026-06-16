@@ -1,0 +1,44 @@
+# Build 缓存
+.gradle/
+build/
+*.apk
+*.aab
+
+# IDE / Android Studio
+.idea/
+*.iml
+.vscode/
+.DS_Store
+local.properties
+captures/
+.cxx/
+*.hprof
+
+# Node（pc-backend 不需要 node_modules，运行时是系统装的 Node）
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 后端二进制和模型（体积大、需单独下载）
+app/backend/win/cuda/*.exe
+app/backend/win/cuda/*.dll
+app/backend/win/vulkan/*.exe
+app/backend/win/vulkan/*.dll
+app/backend/win/cuda/*.weight
+app/backend/win/vulkan/*.weight
+app/models/*.safetensors
+app/models/*.mnn
+app/models/*.mnn.weight
+app/models/*.zip
+app/outputs/
+
+# PC 后端运行日志
+backend_stdout.log
+backend_stderr.log
+
+# 临时调试文件
+*.log
+screen_*.png
+nul
+techjarves-*.url
