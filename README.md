@@ -2,6 +2,7 @@
 
 > 完全离线、AI 画图工具箱 —— Android 手机 + Windows PC 都能跑
 
+![](https://github.com/dmych1989/SD-Ai/blob/main/demo.jpg)
 ## 这是什么
 
 SD-Ai 是一个**完全离线**的 AI 图像生成工具，特点是：
