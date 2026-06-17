@@ -125,6 +125,8 @@ class AppText(val lang: AppLang) {
     val languageEn get() = ifCN("English", "English")
     val appVersion get() = ifCN("版本", "Version")
     val buildTime get() = ifCN("构建时间", "Build Time")
+    val aboutAuthor get() = ifCN("作者", "Author")
+    val aboutGitHub get() = ifCN("项目主页", "GitHub Repo")
     val exportLogs get() = ifCN("导出日志", "Export Logs")
     val viewLogs get() = ifCN("查看日志", "View Logs")
     val clearLogs get() = ifCN("清除日志", "Clear Logs")

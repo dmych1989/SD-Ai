@@ -2,6 +2,8 @@
 // 设置页 — 已支持中英文切换
 package com.sdaiapp.ui.screens
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -292,12 +294,36 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         // ========= 关于 =========
+        val context = LocalContext.current
         SettingsSection(title = t.appName) {
             SettingsItem(
                 icon = Icons.Filled.Info,
                 title = t.appVersion,
                 subtitle = "1.0.0 (${uiState.buildTime})",
                 onClick = { }
+            )
+            Divider(color = DividerDark, modifier = Modifier.padding(start = 52.dp))
+            SettingsItem(
+                icon = Icons.Filled.Person,
+                title = t.aboutAuthor,
+                subtitle = "山以命相卜",
+                onClick = { }
+            )
+            Divider(color = DividerDark, modifier = Modifier.padding(start = 52.dp))
+            SettingsItem(
+                icon = Icons.Filled.Code,
+                title = t.aboutGitHub,
+                subtitle = "github.com/dmych1989/SD-Ai",
+                onClick = {
+                    runCatching {
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://github.com/dmych1989/SD-Ai")
+                        )
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        context.startActivity(intent)
+                    }
+                }
             )
             Divider(color = DividerDark, modifier = Modifier.padding(start = 52.dp))
             SettingsItem(

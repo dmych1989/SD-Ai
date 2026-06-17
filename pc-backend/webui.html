@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>SdAi WebUI — 本地 AI 出图</title>
+<style>
+:root{
+  --bg:#0a0a14;--bg2:#14142b;--bg3:#1c1c3a;
+  --fg:#e6e6f0;--fg2:#9b9bb3;--accent:#a78bfa;--accent2:#7c3aed;
+  --ok:#22c55e;--warn:#f59e0b;--err:#ef4444;--border:#2a2a4a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;display:flex;flex-direction:column}
+header{background:linear-gradient(135deg,var(--bg2) 0%,var(--bg3) 100%);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:14px}
+header h1{font-size:18px;font-weight:600;background:linear-gradient(90deg,var(--accent) 0%,#c4b5fd 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header .dot{width:10px;height:10px;border-radius:50%;background:var(--fg2);transition:all 0.3s}
+header .dot.ok{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+header .dot.warn{background:var(--warn);box-shadow:0 0 8px var(--warn)}
+header .dot.err{background:var(--err);box-shadow:0 0 8px var(--err)}
+header .info{font-size:12px;color:var(--fg2);margin-left:auto;font-family:"Cascadia Code",Consolas,monospace}
+
+main{flex:1;display:grid;grid-template-columns:380px 1fr;gap:0;overflow:hidden}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+
+/* ---------- 左：控制面板 ---------- */
+.panel{background:var(--bg2);border-right:1px solid var(--border);padding:18px;overflow-y:auto}
+.section{margin-bottom:18px}
+.section h2{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--fg2);margin-bottom:10px;font-weight:600}
+textarea,input[type="text"],input[type="number"],select{
+  width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--fg);
+  padding:8px 10px;border-radius:6px;font-size:13px;font-family:inherit;
+  transition:border-color 0.2s;
+}
+textarea:focus,input:focus,select:focus{outline:none;border-color:var(--accent)}
+textarea{resize:vertical;min-height:60px;line-height:1.5}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+label{display:block;font-size:11px;color:var(--fg2);margin-bottom:4px}
+.btn{
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);
+  color:#fff;border:none;padding:10px 18px;border-radius:6px;
+  font-size:14px;font-weight:600;cursor:pointer;width:100%;
+  transition:transform 0.1s,box-shadow 0.2s;letter-spacing:0.5px;
+}
+.btn:hover{box-shadow:0 4px 16px rgba(167,139,250,0.4)}
+.btn:active{transform:scale(0.98)}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.btn-secondary{background:var(--bg3);color:var(--fg);border:1px solid var(--border);margin-top:8px}
+.btn-secondary:hover{background:var(--border);box-shadow:none}
+
+/* ---------- 右：图 + 历史 ---------- */
+.viewer{display:flex;flex-direction:column;overflow:hidden}
+.viewport{flex:1;display:flex;align-items:center;justify-content:center;background:repeating-concurrent-45deg,var(--bg);background-image:repeating-linear-gradient(45deg,#0a0a14 0,#0a0a14 10px,#0f0f1c 10px,#0f0f1c 20px);padding:24px;position:relative;min-height:300px;overflow:auto}
+.viewport .empty{color:var(--fg2);text-align:center}
+.viewport .empty .icon{font-size:48px;margin-bottom:12px;opacity:0.4}
+.viewport img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.6);display:block}
+.viewport .overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(10,10,20,0.85);display:flex;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(4px)}
+.progress{font-size:14px;margin-bottom:14px;font-family:"Cascadia Code",Consolas,monospace;color:var(--accent)}
+.progress-bar{width:60%;max-width:300px;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent) 0%,var(--accent2) 100%);width:0%;transition:width 0.3s}
+
+.history{border-top:1px solid var(--border);background:var(--bg2);padding:12px;max-height:140px;overflow-x:auto;white-space:nowrap}
+.history img{height:80px;border-radius:4px;margin-right:8px;cursor:pointer;transition:transform 0.1s;border:2px solid transparent}
+.history img:hover{transform:scale(1.05);border-color:var(--accent)}
+.history .empty-h{color:var(--fg2);font-size:12px;line-height:80px}
+
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:8px 18px;font-size:11px;color:var(--fg2);display:flex;gap:18px;flex-wrap:wrap;font-family:"Cascadia Code",Consolas,monospace}
+footer span{display:inline-flex;align-items:center;gap:6px}
+footer b{color:var(--accent);font-weight:500}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="dot" id="connDot"></div>
+  <h1>SdAi WebUI</h1>
+  <div class="info" id="connText">未连接</div>
+</header>
+
+<main>
+  <div class="panel">
+
+    <div class="section">
+      <h2>提示词</h2>
+      <label>描述你想要的画面</label>
+      <textarea id="prompt" rows="3" placeholder="a cute cat sitting on a sofa, sunlight, 4k, masterpiece">a cute cat sitting on a sofa, sunlight, 4k, masterpiece</textarea>
+      <label style="margin-top:8px">不想出现的东西（负面提示词）</label>
+      <textarea id="neg" rows="2" placeholder="blurry, low quality">blurry, low quality, bad anatomy</textarea>
+    </div>
+
+    <div class="section">
+      <h2>采样设置</h2>
+      <div class="row">
+        <div><label>采样器</label>
+          <select id="sampler"><option>Euler</option><option>Euler a</option><option>Heun</option><option>DPM2</option><option>DPM++ 2S a</option><option>DPM++ 2M</option><option>DPM++ 2Mv2</option><option>LCM</option></select>
+        </div>
+        <div><label>调度器</label>
+          <select id="scheduler"><option>Karras</option><option>Discrete</option><option>Exponential</option><option>Simple</option><option>Smoothstep</option></select>
+        </div>
+      </div>
+      <div class="row">
+        <div><label>步数</label>
+          <input type="number" id="steps" value="4" min="1" max="50">
+        </div>
+        <div><label>CFG 强度</label>
+          <input type="number" id="cfg" value="7" min="1" max="20" step="0.5">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>画面尺寸</h2>
+      <div class="row">
+        <div><label>宽</label>
+          <input type="number" id="width" value="256" min="64" max="1024" step="8">
+        </div>
+        <div><label>高</label>
+          <input type="number" id="height" value="256" min="64" max="1024" step="8">
+        </div>
+      </div>
+      <label>随机种子（-1 = 每次不同）</label>
+      <input type="number" id="seed" value="-1">
+    </div>
+
+    <div class="section">
+      <button class="btn" id="genBtn" onclick="generate()">出图</button>
+      <button class="btn btn-secondary" id="cancelBtn" onclick="cancel()">取消</button>
+    </div>
+  </div>
+
+  <div class="viewer">
+    <div class="viewport" id="viewport">
+      <div class="empty" id="empty">
+        <div class="icon">🎨</div>
+        <div>输提示词，点"出图"</div>
+      </div>
+    </div>
+    <div class="history" id="history">
+      <span class="empty-h">历史出图会显示在这里</span>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>状态: <b id="fState">—</b></span>
+  <span>模型: <b id="fModel">—</b></span>
+  <span>引擎: <b id="fEngine">—</b></span>
+  <span>本次用时: <b id="fTime">—</b></span>
+</footer>
+
+<script>
+const API = 'http://127.0.0.1:1420';
+const $ = id => document.getElementById(id);
+let busy = false;
+let pollTimer = null;
+let startTime = 0;
+
+async function checkConn(){
+  try{
+    const r = await fetch(API + '/', {signal: AbortSignal.timeout(2000)});
+    const j = await r.json();
+    $('connDot').className = 'dot ok';
+    $('connText').textContent = '已连接 · ' + j.cores + ' 核';
+    $('fState').textContent = j.state;
+    $('fModel').textContent = (j.model || '').split('\\').pop() || '未加载';
+    $('fEngine').textContent = j.sdVersion;
+    return true;
+  }catch(e){
+    $('connDot').className = 'dot err';
+    $('connText').textContent = '连不上 ' + API + '（确认后端在跑）';
+    return false;
+  }
+}
+
+async function generate(){
+  if(busy) return;
+  if(!await checkConn()) return;
+  busy = true;
+  $('genBtn').disabled = true;
+  startTime = Date.now();
+
+  const body = {
+    prompt: $('prompt').value,
+    negative_prompt: $('neg').value,
+    steps: parseInt($('steps').value),
+    cfg_scale: parseFloat($('cfg').value),
+    width: parseInt($('width').value),
+    height: parseInt($('height').value),
+    seed: parseInt($('seed').value),
+    sampler_name: $('sampler').value,
+    scheduler: $('scheduler').value,
+    batch_size: 1
+  };
+
+  // 进度遮罩
+  showOverlay('准备中...', 0);
+
+  // 轮询进度
+  pollTimer = setInterval(async ()=>{
+    try{
+      const r = await fetch(API + '/sdapi/v1/progress');
+      const p = await r.json();
+      if(p.state === 'running' && p.progress > 0){
+        showOverlay(`第 ${p.progress*100|0}% 步 (${((Date.now()-startTime)/1000)|0}s)`, p.progress);
+      }
+    }catch(e){}
+  }, 800);
+
+  try{
+    const r = await fetch(API + '/sdapi/v1/txt2img', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    const j = await r.json();
+    if(j.error){
+      alert('出图失败：' + j.error);
+      hideOverlay();
+    } else {
+      const dataUri = j.images[0];
+      showImage(dataUri);
+      addToHistory(dataUri, body);
+      const sec = ((Date.now()-startTime)/1000).toFixed(1);
+      $('fTime').textContent = sec + 's';
+    }
+  }catch(e){
+    alert('请求失败：' + e.message);
+    hideOverlay();
+  }finally{
+    clearInterval(pollTimer);
+    busy = false;
+    $('genBtn').disabled = false;
+  }
+}
+
+async function cancel(){
+  if(!busy) return;
+  try{ await fetch(API + '/sdapi/v1/interrupt', {method:'POST'}); }catch(e){}
+}
+
+function showOverlay(text, frac){
+  let ov = $('overlay');
+  if(!ov){
+    ov = document.createElement('div');
+    ov.id = 'overlay';
+    ov.className = 'overlay';
+    ov.innerHTML = '<div class="progress" id="ovText"></div><div class="progress-bar"><div class="progress-fill" id="ovFill"></div></div>';
+    $('viewport').appendChild(ov);
+  }
+  ov.style.display = 'flex';
+  $('ovText').textContent = text;
+  $('ovFill').style.width = (frac*100) + '%';
+}
+function hideOverlay(){
+  const ov = $('overlay');
+  if(ov) ov.style.display = 'none';
+}
+function showImage(dataUri){
+  hideOverlay();
+  const empty = $('empty');
+  if(empty) empty.remove();
+  let img = $('viewport').querySelector('img.main');
+  if(!img){
+    img = document.createElement('img');
+    img.className = 'main';
+    $('viewport').appendChild(img);
+  }
+  img.src = dataUri;
+  img.style.cursor = 'pointer';
+  img.onclick = ()=>{
+    const a = document.createElement('a');
+    a.href = dataUri; a.download = 'sdai_' + Date.now() + '.png'; a.click();
+  };
+}
+function addToHistory(dataUri, body){
+  const h = $('history');
+  if(h.querySelector('.empty-h')) h.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = dataUri;
+  img.title = body.prompt + ' (' + body.width + 'x' + body.height + ', ' + body.steps + '步)';
+  img.onclick = ()=>showImage(dataUri);
+  h.insertBefore(img, h.firstChild);
+}
+
+// 启动时测连接 + 每 5 秒保活
+checkConn();
+setInterval(checkConn, 5000);
+
+// 回车键 = 出图（在 prompt 里按 Ctrl+Enter）
+$('prompt').addEventListener('keydown', e=>{
+  if(e.ctrlKey && e.key==='Enter') generate();
+});
+</script>
+
+</body>
+</html>
